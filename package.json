@@ -1,0 +1,14 @@
+{
+  "name": "phgms-db",
+  "version": "1.0.0",
+  "description": "DB module for PHGMS",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "phgms"
+  ],
+  "author": "Philip Huysmans",
+  "license": "ISC"
+}
