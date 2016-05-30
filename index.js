@@ -1,6 +1,8 @@
 module.exports = function(dependencies, config) {
-	function insert() {
+	var dbName = config.dbName || "test";
 
+	function insert() {
+		dependencies.r.table(dbName).insert();
 	}
 
 	return {
