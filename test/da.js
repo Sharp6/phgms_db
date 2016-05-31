@@ -9,13 +9,24 @@ chai.use(require('sinon-chai'));
 var sinon = require('sinon');
 
 function createDependencies() {
-	var insertSpy = sinon.spy();
-	
+	var insertSpy = sinon.stub();
+	var connectSpy = sinon.stub();
+	connectSpy.returns({ not: "empty" });
+
 	return {
 		r: {
-			table: function(dbname) {
+			connect: connectSpy,
+			db: function(dbName) {
 				return {
-					insert: insertSpy
+					table: function(dbname) {
+						return {
+							insert: function() {
+								return {
+									run: insertSpy
+								}	
+							}
+						}
+					}		
 				}
 			}
 		}
@@ -24,18 +35,28 @@ function createDependencies() {
 
 var phgmsDb = require('../index');
 
-describe("An insert is requested", function() {
+describe("Database functionality", function() {
 	beforeEach(function() {
 		this.dependencies = createDependencies();
 		this.config = {
 			dbName: "phgms"
 		}
 		this.db = new phgmsDb(this.dependencies,this.config);
-		this.db.insert({foo: "bar"});
 	});
 
-	it("should insert the object into the database", function() {
-		expect(this.dependencies.r.table(this.config.dbName).insert).to.have.been.called.once;
+	it("should have connected to the database", function() {
+		expect(this.dependencies.r.connect).to.have.been.called.once;
 	});
 
-}); 
+	describe("An insert is requested", function() {
+		beforeEach(function() {
+			this.db.insert({foo: "bar"});
+		});
+
+		it("should insert the object into the database", function() {
+			expect(this.dependencies.r.db(this.config.dbName).table(this.config.dbName).insert().run).to.have.been.called.once;
+		});
+
+	}); 
+});
+
